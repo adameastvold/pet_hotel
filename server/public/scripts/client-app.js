@@ -2,13 +2,14 @@ $(document).ready(function() {
     // getBooks();
     getOwner();
     getJoin();
+    // appendRegistry();
 
     // add a book
     $('#owner-submit').on('click', postOwner);
     $('#pet-submit').on('click', postPet);
 
-    // $('#book-list').on('click', '.update', putBook);
-    // $('#book-list').on('click', '.delete', deleteBook);
+    $('#registry').on('click', '.update', putPet);
+    $('#registry').on('click', '.delete', deletePet);
     // $('#genre-select-box').on('click', '.genre-submit', getGenre);
 });
 
@@ -34,11 +35,13 @@ $(document).ready(function() {
 //
 function appendRegistry(entry) {
     var $el = $('<div></div>');
-    var entryProperties = ['owner', 'pet', 'breed', 'color'];
+    var entryProperties = ['name', 'breed', 'color'];
     console.log('entry is: ', entry);
+    $('#registry').append('<input id="ownerName disabledInput" type="text" value="' + entry.first_name + ' ' + entry.last_name + '"></label>');
 
     entryProperties.forEach(function(property) {
-        var inputType = 'text';
+
+        // if (property == '')
         // if (property == 'published') {           
         //     book[property] = new Date(book[property]);
         //
@@ -53,16 +56,18 @@ function appendRegistry(entry) {
         //                 
         //     book[property] = month + "/" + day + "/" + year;          
         // }
-
+        var inputType = 'text';
         var $input = $('<input type="' + inputType + '" id="' + property + '" name="' + property + '" />');
         $input.val(entry[property]);
         $el.append($input);
     });
 
-    // $el.data('bookId', book.id);
+    $el.data('petId', entry.id);
+    console.log('pet id', entry.id);
+
     $el.append('<button class="update">Update</button>');
     $el.append('<button class="delete">Delete</button>');
-    $el.append('<button class="delete">Check In/Out</button>');
+    $el.append('<button class="checkinout">Check In/Out</button>');
 
     $('#registry').append($el);
 }
@@ -70,7 +75,7 @@ function appendRegistry(entry) {
 /**
  * Add a new book to the database and refresh the DOM
  */
-function postOwner() {
+function postOwner(event) {
     event.preventDefault();
 
     var owner = {};
@@ -95,7 +100,7 @@ function postOwner() {
     });
 }
 
-function postPet() {
+function postPet(event) {
     event.preventDefault();
 
     var pet = {};
@@ -155,68 +160,69 @@ function getJoin() {
             // appendOwner(owners);
 
             entries.forEach(function(entry) {
+                console.log('entry', entry);
                 appendRegistry(entry);
                 // build the append here
                 // $('#selectedOwner').append('<option value="' + owner.id +
                 //     '">' + owner.first_name + ' ' + owner.last_name + '</option>');
+                // entryReturned = entry;
+                // return entryReturned;
             })
         },
 
         error: function(response) {
-            console.log('GET /owner fail. No owners could be retrieved!');
+            console.log('GET /joiner fail. No joins could be retrieved!');
         },
     });
 }
 
 
-function appendRegistry() {
 
-}
 
 //select the 'selector' and append to it <options> with the get data
 
 
-// function putBook() {
-//     var book = {};
-//     var inputs = $(this).parent().children().serializeArray();
-//     $.each(inputs, function(i, field) {
-//         book[field.name] = field.value;
-//     });
-//
-//     console.log('book we are putting:', book);
-//
-//     var bookId = $(this).parent().data('bookId');
-//
-//     $.ajax({
-//         type: 'PUT',
-//         url: '/books/' + bookId,
-//         data: book,
-//         success: function() {
-//             $('#book-list').empty();
-//             getBooks();
-//         },
-//         error: function() {
-//             console.log('No Put for yo Books' + bookId);
-//         },
-//     });
-// }
+function putPet() {
+    var pet = {};
+    var inputs = $(this).parent().children().serializeArray();
+    $.each(inputs, function(i, field) {
+        pet[field.name] = field.value;
+    });
 
-// function deleteBook() {
-//     var bookId = $(this).parent().data('bookId');
-//
-//     $.ajax({
-//         type: 'DELETE',
-//         url: '/books/' + bookId,
-//         success: function() {
-//             console.log('DELETE success!!');
-//             $('#book-list').empty();
-//             getBooks();
-//         },
-//         error: function() {
-//             console.log('DELETE aint working yo');
-//         }
-//     });
-// }
+    console.log('pet we are putting:', pet);
+
+    var petId = $(this).parent().data('petId');
+
+    $.ajax({
+        type: 'PUT',
+        url: '/pet/' + petId,
+        data: pet,
+        success: function() {
+            $('#registry').empty();
+            getJoin();
+        },
+        error: function() {
+            console.log('No Put for yo critters' + petId);
+        },
+    });
+}
+
+function deletePet() {
+    var petId = $(this).parent().data('petId');
+
+    $.ajax({
+        type: 'DELETE',
+        url: '/pet/' + petId,
+        success: function() {
+            $('#registry').empty();
+            console.log('DELETE success!!');
+            // getJoin();
+        },
+        error: function() {
+            console.log('DELETE aint working yo');
+        }
+    });
+}
 //
 // function getGenre() {
 //     event.preventDefault();

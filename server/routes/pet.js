@@ -76,58 +76,68 @@ router.post('/', function(req, res) {
 });
 
 //=========================================
-// router.put('/:id', function(req, res) {
-//     var id = req.params.id;
-//     var book = req.body;
+router.put('/:id', function(req, res) {
+    var id = req.params.id;
+    var pet = req.body;
+    console.log(id);
+    pg.connect(connectionString, function(err, client, done) {
+        if (err) {
+            res.sendStatus(500);
+        }
+
+        client.query('UPDATE pets ' +
+            'SET name = $1, ' +
+            'breed = $2, ' +
+            'color = $3 ' +
+            'WHERE id = $4', [pet.name, pet.breed, pet.color, id],
+            function(err, result) {
+                done();
+
+                if (err) {
+                    console.log('err', err)
+                    res.sendStatus(500);
+                } else {
+                    res.sendStatus(200);
+                }
+            });
+    });
+});
 //
-//     pg.connect(connectionString, function(err, client, done) {
-//         if (err) {
-//             res.sendStatus(500);
-//         }
-//
-//         client.query('UPDATE books ' +
-//             'SET author = $1, ' +
-//             'title = $2, ' +
-//             'published = $3, ' +
-//             'edition = $4, ' +
-//             'publisher = $5, ' +
-//             'genre = $6 ' +
-//             'WHERE id = $7', [book.author, book.title, book.published, book.edition, book.publisher, book.genre, id],
-//             function(err, result) {
-//                 done();
-//
-//                 if (err) {
-//                     console.log('err', err)
-//                     res.sendStatus(500);
-//                 } else {
-//                     res.sendStatus(200);
-//                 }
-//             });
-//     });
-// });
-//
-// router.delete('/:id', function(req, res) {
-//     var id = req.params.id;
-//
-//     pg.connect(connectionString, function(err, client, done) {
-//         if (err) {
-//             res.sendStatus(500);
-//         }
-//
-//         client.query('DELETE FROM books ' +
-//             'WHERE id = $1', [id],
-//             function(err, result) {
-//                 done();
-//
-//                 if (err) {
-//                     res.sendStatus(500);
-//                     return;
-//                 }
-//
-//                 res.sendStatus(200);
-//             });
-//     });
-// });
+router.delete('/:id', function(req, res) {
+    var id = req.params.id;
+
+    pg.connect(connectionString, function(err, client, done) {
+        if (err) {
+            res.sendStatus(500);
+        }
+
+        client.query('DELETE FROM visits ' +
+            'WHERE id = $1', [id],
+            function(err, result) {
+                done();
+
+                if (err) {
+                    res.sendStatus(500);
+                    return;
+                }
+
+                res.sendStatus(200);
+            });
+
+        // client.query('DELETE FROM pets ' +
+        //     'WHERE id = $1', [id],
+        //     function(err, result) {
+        //         done();
+        //
+        //         if (err) {
+        //             res.sendStatus(500);
+        //             return;
+        //         }
+        //
+        //         res.sendStatus(200);
+        //     });
+    });
+});
 //
 // router.get('/:genre', function(req, res) {
 //     var genre = req.params.genre;
